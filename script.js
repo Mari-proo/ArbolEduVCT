@@ -970,6 +970,7 @@ function evaluarRespuestaActual() {
   const pregunta = appState.quiz.preguntas[appState.quiz.indice];
   const respuestaNormalizada = normalizarSecuenciaRespuesta(respuesta);
   const esperada = pregunta.secuencia.map((valor) => String(valor).toUpperCase());
+  document.getElementById("quiz-answer").value = "";
 
   const correcta = JSON.stringify(respuestaNormalizada) === JSON.stringify(esperada);
 
