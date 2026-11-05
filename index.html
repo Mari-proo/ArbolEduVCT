@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArbolEduVCT</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="presentation">
+              <path d="M24 7v34M24 17 13 10M24 24l12-9M24 31 13 24M24 37l12-8" />
+              <circle cx="12" cy="9" r="4" />
+              <circle cx="37" cy="14" r="4" />
+              <circle cx="11" cy="23" r="4" />
+              <circle cx="37" cy="28" r="4" />
+              <circle cx="24" cy="6" r="4" />
+              <circle cx="24" cy="41" r="4" />
+            </svg>
+          </div>
+          <div class="brand-copy">
+            <p class="eyebrow">Un espacio para aprender haciendo</p>
+            <h1>ArbolEduVCT</h1>
+            <p class="brand-note">Explora, prueba y entiende los árboles binarios.</p>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="nav-btn active" data-target="simulador">Simulador</button>
+          <button class="nav-btn" data-target="teoria">Teoría</button>
+          <button class="nav-btn" data-target="quiz">Quiz</button>
+        </nav>
+      </header>
+
+      <main class="main-content">
+        <section id="simulador" class="panel active-panel">
+          <div class="panel-header">
+            <p class="section-kicker">01 · Practica</p>
+            <h2>Construye tu árbol</h2>
+            <p class="section-intro">Agrega valores y sigue el camino que toma cada operación.</p>
+          </div>
+
+          <div class="simulator-layout">
+            <div class="tree-panel">
+              <div class="tree-toolbar">
+                <div class="toolbar-group">
+                  <label for="valor-input">Valor</label>
+                  <input id="valor-input" type="text" maxlength="21" autocomplete="off" placeholder="Entero (25) o una letra (A)" />
+                  <small class="input-help">Se aceptan valores repetidos; los iguales se colocan a la izquierda.</small>
+                </div>
+                <div class="toolbar-group action-buttons">
+                  <button id="insert-btn" class="primary">Insertar</button>
+                  <button id="delete-btn" class="danger">Eliminar</button>
+                  <button id="search-btn">Buscar</button>
+                </div>
+              </div>
+
+              <div class="tree-toolbar secondary-row">
+                <div class="toolbar-group action-buttons compact">
+                  <button id="preorder-btn">Preorden</button>
+                  <button id="inorder-btn">Inorden</button>
+                  <button id="postorder-btn">Postorden</button>
+                </div>
+                <div class="toolbar-group action-buttons compact">
+                  <button id="clear-tree-btn">Limpiar árbol</button>
+                  <button id="load-example-btn">Ejemplo</button>
+                  <button id="reset-simulator-btn">Reiniciar</button>
+                </div>
+              </div>
+
+              <div class="visual-area">
+                <div id="tree-container" class="tree-container" aria-live="polite"></div>
+              </div>
+            </div>
+
+            <aside class="console-panel">
+              <div class="console-header">
+                <h3>Consola de operaciones</h3>
+                <button id="clear-console-btn" class="small">Limpiar consola</button>
+              </div>
+              <div id="console" class="console" aria-live="polite"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="teoria" class="panel">
+          <div class="panel-header">
+            <p class="section-kicker">02 · Descubre</p>
+            <h2>Conceptos que conectan</h2>
+            <p class="section-intro">Elige una palabra para entender qué papel tiene en el árbol.</p>
+          </div>
+
+          <div class="theory-layout">
+            <div class="concept-list" id="concept-list" aria-label="Conceptos del árbol binario"></div>
+            <div class="concept-detail">
+              <div id="concept-detail" class="concept-card"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="quiz" class="panel">
+          <div class="panel-header">
+            <p class="section-kicker">03 · Pon a prueba lo aprendido</p>
+            <h2>Reto de recorridos</h2>
+            <p class="section-intro">Mira el árbol, sigue el recorrido y escribe los valores en orden.</p>
+          </div>
+
+          <div class="quiz-layout">
+            <div class="quiz-card">
+              <div class="quiz-topbar">
+                <div>
+                  <p class="quiz-label">Un reto a tu ritmo</p>
+                  <h3 id="quiz-title">Preparando preguntas...</h3>
+                </div>
+                <button id="start-quiz-btn" class="primary">Iniciar cuestionario</button>
+              </div>
+
+              <div id="quiz-tree-container" class="mini-tree-container"></div>
+
+              <div class="quiz-question-wrap">
+                <label for="quiz-answer">Escribe la secuencia correcta</label>
+                <input id="quiz-answer" type="text" placeholder="Ej. 10 5 2 8 15" />
+                <div class="quiz-actions">
+                  <button id="submit-answer-btn" class="primary">Enviar respuesta</button>
+                  <button id="restart-quiz-btn">Reiniciar cuestionario</button>
+                </div>
+              </div>
+
+              <div id="quiz-feedback" class="quiz-feedback"></div>
+            </div>
+
+            <div class="score-card">
+              <h3>Resultados</h3>
+              <div class="score-metric">
+                <span>Correctas</span>
+                <strong id="score-correct">0</strong>
+              </div>
+              <div class="score-metric">
+                <span>Incorrectas</span>
+                <strong id="score-incorrect">0</strong>
+              </div>
+              <div class="score-metric total">
+                <span>Calificación</span>
+                <strong id="score-total">0%</strong>
+              </div>
+              <div id="score-summary" class="score-summary">Aún no has comenzado.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
