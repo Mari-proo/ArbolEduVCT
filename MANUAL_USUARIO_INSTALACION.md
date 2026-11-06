@@ -79,8 +79,8 @@ Al pulsar cualquiera de los botones, la interfaz:
 ### Análisis de subárboles
 
 1. Pulsa **Analizar subárboles** después de construir el árbol.
-2. Se muestra un resumen del árbol completo y una ficha por cada nodo que tiene al menos un hijo, considerado como raíz de un subárbol.
-3. Cada ficha cuenta solo la raíz y sus hijos directos (de 1 a 3 nodos). También muestra los recorridos preorden, inorden y postorden, la altura completa del subárbol, el grado de su raíz, el grado máximo del subárbol y el nivel de esa raíz en el árbol completo.
+2. Se muestra una ficha con los datos del árbol completo —cantidad total de nodos, orden, nivel y grado de la raíz, grado máximo, altura y recorridos— y otra ficha por cada nodo que tiene al menos un hijo, considerado como raíz de un subárbol.
+3. Cada ficha de subárbol cuenta solo la raíz y sus hijos directos (de 1 a 3 nodos). También muestra los recorridos preorden, inorden y postorden, la altura completa del subárbol, el grado de su raíz, el grado máximo del subárbol y el nivel de esa raíz en el árbol completo.
 4. Los recorridos y las medidas de altura y grado abarcan todas las ramas del subárbol; el conteo de nodos de la ficha solo incluye la raíz y sus hijos directos. Las hojas no se muestran como subárboles individuales. Si el árbol solo tiene una raíz-hoja, se muestra un aviso sin fichas de subárbol.
 5. El resumen del árbol completo sí cuenta todos sus nodos. La altura cuenta aristas desde la raíz del subárbol hasta su hoja más lejana; una hoja tiene altura 0. El nivel de la raíz del árbol es 0. El grado de un nodo es la cantidad de hijos que tiene, y el grado del subárbol es el grado máximo entre sus nodos.
 6. Si el árbol cambia, el resultado anterior se oculta; vuelve a pulsar el botón para analizar su estructura actual.
@@ -92,15 +92,20 @@ La sección teórica presenta un glosario con conceptos fundamentales:
 - Árbol binario
 - Nodo
 - Nodo raíz
-- Padre
-- Hijo
+- Nodo padre
+- Nodo hijo
 - Hijo izquierdo
 - Hijo derecho
 - Hoja
+- Rama
 - Subárbol
+- Orden
 - Altura
 - Grado
 - Nivel
+- Árboles binarios distintos
+- Árboles binarios equivalentes
+- Árbol binario completo
 
 Cada concepto incluye:
 
@@ -120,12 +125,12 @@ La visualización del simulador permite desplazarse horizontal y verticalmente c
 
 ## 8. Evaluador de competencias (Quiz)
 
-La sección de evaluación genera un cuestionario con 10 preguntas por intento, cada una con un árbol distinto. El sistema:
+La sección de evaluación genera un cuestionario de 15 preguntas por intento. Incluye preguntas de conceptos y recorridos:
 
-- genera un árbol válido,
-- elige un recorrido aleatorio,
-- solicita la secuencia correcta,
-- compara la respuesta con la secuencia real del recorrido,
+- pregunta sobre nodo raíz, padre, hijo, hoja, rama, orden, grado, nivel y altura,
+- repasa árboles binarios distintos, equivalentes y completos,
+- genera árboles para practicar preorden, inorden y postorden,
+- pide escribir una respuesta breve y la valida sin distinguir mayúsculas ni acentos,
 - calcula la calificación final.
 
 El árbol de cada pregunta se acomoda según su estructura. Si excede el ancho disponible, se puede desplazar horizontalmente; si es alto, la página se extiende para mostrar todos sus niveles.

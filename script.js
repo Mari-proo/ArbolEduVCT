@@ -334,18 +334,25 @@ const conceptData = {
     colores: ["Raíz"]
   },
   padre: {
-    titulo: "Padre",
+    titulo: "Nodo padre",
     definicion: "Un padre es un nodo que tiene uno o dos hijos conectados a él.",
     significado: "La relación padre-hijo organiza la jerarquía del árbol.",
     ejemplo: "Si 30 tiene a 20 y 40 como hijos, entonces 30 es el padre de ambos.",
     colores: ["Padre", "Hijos"]
   },
   hijo: {
-    titulo: "Hijo",
-    definicion: "Es cualquier nodo que desciende desde otro nodo.",
-    significado: "Los hijos permiten ramificar el árbol en subproblemas y en subárboles.",
+    titulo: "Nodo hijo",
+    definicion: "Es un nodo conectado directamente debajo de otro nodo, llamado padre.",
+    significado: "Cada nodo de un árbol binario puede tener como máximo dos hijos: izquierdo y derecho.",
     ejemplo: "En la relación 50 → 20, el nodo 20 es hijo izquierdo de 50.",
     colores: ["Hijo izquierdo", "Hijo derecho"]
+  },
+  rama: {
+    titulo: "Rama",
+    definicion: "Es el camino de nodos y conexiones que va desde la raíz hacia una hoja.",
+    significado: "Las ramas muestran las rutas que pueden seguirse dentro del árbol.",
+    ejemplo: "En 50 → 20 → 10, esa secuencia forma una rama desde la raíz hasta la hoja 10.",
+    colores: ["Raíz", "Hijos", "Hoja"]
   },
   "hijo-izquierdo": {
     titulo: "Hijo izquierdo",
@@ -384,10 +391,17 @@ const conceptData = {
   },
   grado: {
     titulo: "Grado",
-    definicion: "El grado de un nodo es la cantidad de hijos que tiene; en un árbol binario puede ser 0, 1 o 2.",
-    significado: "El grado de un subárbol es el mayor grado de cualquiera de sus nodos.",
-    ejemplo: "Si 50 tiene como hijos a 20 y 80, su grado es 2; si ninguno tiene hijos, el grado del árbol también es 2.",
+    definicion: "El grado de un nodo es la cantidad de hijos directos que tiene; en un árbol binario puede ser 0, 1 o 2.",
+    significado: "El grado del árbol es el mayor grado entre sus nodos.",
+    ejemplo: "Si 50 tiene como hijos a 20 y 80, el grado de 50 es 2. Si ningún nodo tiene más de un hijo, el grado del árbol es 1.",
     colores: ["Grado"]
+  },
+  orden: {
+    titulo: "Orden",
+    definicion: "El orden de un árbol indica el máximo número de hijos que puede tener cada nodo.",
+    significado: "En un árbol binario el orden es 2: cada nodo puede tener hijo izquierdo, hijo derecho, ambos o ninguno.",
+    ejemplo: "Un nodo con dos hijos alcanza el máximo permitido por el orden 2 de un árbol binario.",
+    colores: ["Hijo izquierdo", "Hijo derecho"]
   },
   nivel: {
     titulo: "Nivel",
@@ -395,6 +409,27 @@ const conceptData = {
     significado: "La raíz está en el nivel 0, sus hijos en el nivel 1 y así sucesivamente.",
     ejemplo: "Los nodos 20 y 80 están en el nivel 1 si son hijos de 50.",
     colores: ["Nivel 0", "Nivel 1", "Nivel 2"]
+  },
+  "arboles-distintos": {
+    titulo: "Árboles binarios distintos",
+    definicion: "Dos árboles binarios son distintos cuando su estructura o la disposición de sus nodos no es la misma.",
+    significado: "Comparar su forma permite diferenciarlos aunque tengan la misma cantidad de nodos.",
+    ejemplo: "Un árbol con raíz e hijo izquierdo y otro con raíz e hijo derecho tienen estructuras distintas.",
+    colores: ["Estructura A", "Estructura B"]
+  },
+  "arboles-equivalentes": {
+    titulo: "Árboles binarios equivalentes",
+    definicion: "Dos árboles binarios son equivalentes cuando tienen la misma estructura, aunque los valores guardados puedan ser diferentes.",
+    significado: "La equivalencia compara la forma y las relaciones padre-hijo, no los datos de cada nodo.",
+    ejemplo: "Dos árboles con raíz y dos hijos en las mismas posiciones son equivalentes aunque sus valores sean distintos.",
+    colores: ["Misma estructura"]
+  },
+  "arbol-completo": {
+    titulo: "Árbol binario completo",
+    definicion: "Es un árbol en el que todos los niveles, excepto quizá el último, están llenos; el último se ocupa de izquierda a derecha.",
+    significado: "Esta forma mantiene los nodos lo más agrupados posible hacia la izquierda.",
+    ejemplo: "Un árbol con todos sus niveles completos salvo el último, cuyos nodos comienzan por la izquierda, es completo.",
+    colores: ["Niveles llenos", "Izquierda"]
   }
 };
 
@@ -583,10 +618,42 @@ function mostrarAnalisisSubarboles() {
   }
 
   const analisisCompleto = subarboles[0];
-  const resumen = document.createElement("p");
-  resumen.className = "subtree-summary";
-  resumen.textContent = `Árbol completo: ${analisisCompleto.cantidadNodos} nodos totales, altura ${analisisCompleto.altura} ${analisisCompleto.altura === 1 ? "arista" : "aristas"} y grado máximo ${analisisCompleto.grado}.`;
-  panel.appendChild(resumen);
+  const tarjetaArbol = document.createElement("article");
+  tarjetaArbol.className = "subtree-card";
+
+  const tituloArbol = document.createElement("h4");
+  tituloArbol.textContent = `Árbol completo · raíz ${formatValue(analisisCompleto.nodo.valor)}`;
+  tarjetaArbol.appendChild(tituloArbol);
+
+  const metricasArbol = document.createElement("ul");
+  metricasArbol.className = "subtree-metrics";
+  const datosArbol = [
+    `Cantidad total de nodos: ${analisisCompleto.cantidadNodos}`,
+    "Orden: 2",
+    `Nivel de la raíz: ${analisisCompleto.nivel}`,
+    `Altura: ${analisisCompleto.altura} ${analisisCompleto.altura === 1 ? "arista" : "aristas"}`,
+    `Grado de la raíz: ${analisisCompleto.gradoRaiz}`,
+    `Grado máximo del árbol: ${analisisCompleto.grado}`
+  ];
+  for (const dato of datosArbol) {
+    const elemento = document.createElement("li");
+    elemento.textContent = dato;
+    metricasArbol.appendChild(elemento);
+  }
+  tarjetaArbol.appendChild(metricasArbol);
+
+  const recorridosArbol = [
+    ["Preorden", analisisCompleto.preorden],
+    ["Inorden", analisisCompleto.inorden],
+    ["Postorden", analisisCompleto.postorden]
+  ];
+  for (const [nombre, secuencia] of recorridosArbol) {
+    const recorrido = document.createElement("p");
+    recorrido.className = "subtree-traversal";
+    recorrido.textContent = `${nombre}: ${secuencia.map(formatValue).join(" → ")}`;
+    tarjetaArbol.appendChild(recorrido);
+  }
+  panel.appendChild(tarjetaArbol);
 
   if (subarbolesConRamas.length === 0) {
     const mensaje = document.createElement("p");
@@ -616,6 +683,7 @@ function mostrarAnalisisSubarboles() {
     metricas.className = "subtree-metrics";
     const datosMetricas = [
       `Nodos (raíz e hijos directos): ${analisis.cantidadNodosDirectos}`,
+      "Orden del árbol binario: 2",
       `Altura: ${analisis.altura} ${analisis.altura === 1 ? "arista" : "aristas"}`,
       `Grado de la raíz: ${analisis.gradoRaiz}`,
       `Grado máximo del subárbol: ${analisis.grado}`
@@ -955,17 +1023,116 @@ function prepareConceptSection() {
   renderConceptDetail();
 }
 
-function generarPreguntaAleatoria() {
+function generarPreguntaAleatoria(tipo) {
   const valoresBase = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 75, 90, 15, 45, 95, 5, 12, 68, 88, 22];
   const cantidad = 6 + Math.floor(Math.random() * 4);
   const mezcla = [...valoresBase].sort(() => Math.random() - 0.5).slice(0, cantidad);
   const arbol = new ArbolBinario();
 
   mezcla.forEach((valor) => arbol.insertar(valor));
-  const recorridos = ["preorden", "inorden", "postorden"];
-  const tipo = recorridos[Math.floor(Math.random() * recorridos.length)];
   const secuencia = arbol[tipo]();
-  return { arbol, tipo, secuencia };
+  return { categoria: "recorrido", tipo, arbol, secuencia };
+}
+
+function generarPreguntasConceptuales() {
+  return [
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama el nodo conectado directamente debajo de otro nodo?",
+      respuesta: "hijo",
+      respuestasAceptadas: ["hijo", "nodo hijo"],
+      explicacion: "Un hijo está conectado directamente con su nodo padre."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama el nodo que tiene uno o más hijos?",
+      respuesta: "padre",
+      respuestasAceptadas: ["padre", "nodo padre"],
+      explicacion: "El padre es el nodo del que descienden directamente uno o dos hijos."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama el primer nodo del árbol, que no tiene padre?",
+      respuesta: "raíz",
+      respuestasAceptadas: ["raiz", "nodo raiz"],
+      explicacion: "La raíz es el punto inicial del árbol y no tiene padre."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama un nodo que no tiene hijos?",
+      respuesta: "hoja",
+      respuestasAceptadas: ["hoja", "nodo hoja"],
+      explicacion: "Una hoja es un nodo sin hijos."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama el camino de nodos desde la raíz hasta una hoja?",
+      respuesta: "rama",
+      respuestasAceptadas: ["rama", "una rama"],
+      explicacion: "Una rama es una ruta que conecta la raíz con una hoja."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cuál es el orden de un árbol binario (máximo de hijos por nodo)?",
+      respuesta: "2",
+      respuestasAceptadas: ["2", "dos"],
+      explicacion: "El orden es 2 porque cada nodo puede tener como máximo dos hijos."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "Si el nodo 40 tiene dos hijos directos, ¿cuál es su grado?",
+      respuesta: "2",
+      respuestasAceptadas: ["2", "dos"],
+      explicacion: "El grado de un nodo es la cantidad de hijos directos que tiene."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "Si la raíz está en el nivel 0, ¿en qué nivel están sus hijos directos?",
+      respuesta: "1",
+      respuestasAceptadas: ["1", "nivel 1"],
+      explicacion: "Los hijos directos de la raíz están en el nivel 1."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "Si la ruta más larga desde la raíz hasta una hoja tiene 3 aristas, ¿cuál es la altura del árbol?",
+      respuesta: "3",
+      respuestasAceptadas: ["3", "3 aristas"],
+      explicacion: "La altura cuenta las aristas de la ruta más larga desde la raíz hasta una hoja."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se clasifican dos árboles cuya estructura o disposición de nodos es diferente?",
+      respuesta: "distintos",
+      respuestasAceptadas: ["distintos", "diferentes", "arboles distintos", "arboles binarios distintos"],
+      explicacion: "Los árboles binarios distintos no tienen la misma estructura o disposición."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se clasifican dos árboles con la misma estructura, aunque sus valores sean diferentes?",
+      respuesta: "equivalentes",
+      respuestasAceptadas: ["equivalentes", "arboles equivalentes", "arboles binarios equivalentes"],
+      explicacion: "Los árboles equivalentes conservan la misma forma y relaciones entre nodos, aunque cambien los datos."
+    },
+    {
+      categoria: "concepto",
+      pregunta: "¿Cómo se llama el árbol donde todos los niveles salvo quizá el último están llenos y el último se ocupa de izquierda a derecha?",
+      respuesta: "completo",
+      respuestasAceptadas: ["completo", "arbol completo", "arbol binario completo"],
+      explicacion: "En un árbol binario completo, el último nivel se llena de izquierda a derecha."
+    }
+  ];
+}
+
+function generarPreguntasCuestionario() {
+  const preguntasRecorridos = ["preorden", "inorden", "postorden"].map(generarPreguntaAleatoria);
+  const preguntas = [...preguntasRecorridos, ...generarPreguntasConceptuales()];
+
+  for (let indice = preguntas.length - 1; indice > 0; indice -= 1) {
+    const aleatorio = Math.floor(Math.random() * (indice + 1));
+    [preguntas[indice], preguntas[aleatorio]] = [preguntas[aleatorio], preguntas[indice]];
+  }
+
+  return preguntas;
 }
 
 function renderQuizTree(arbol) {
@@ -1067,7 +1234,7 @@ function renderQuizTree(arbol) {
 }
 
 function iniciarCuestionario() {
-  const preguntas = Array.from({ length: 10 }, () => generarPreguntaAleatoria());
+  const preguntas = generarPreguntasCuestionario();
   appState.quiz = {
     preguntas,
     indice: 0,
@@ -1076,13 +1243,13 @@ function iniciarCuestionario() {
     completado: false
   };
 
-  document.getElementById("quiz-title").textContent = "Pregunta 1 de 10";
+  document.getElementById("quiz-title").textContent = `Pregunta 1 de ${preguntas.length}`;
   document.getElementById("quiz-answer").value = "";
-  document.getElementById("quiz-feedback").textContent = "El árbol está listo. Escribe la secuencia del recorrido indicado.";
   document.getElementById("score-correct").textContent = "0";
   document.getElementById("score-incorrect").textContent = "0";
   document.getElementById("score-total").textContent = "0%";
   document.getElementById("score-summary").textContent = "Aún no has terminado el cuestionario.";
+  document.getElementById("quiz-feedback").textContent = "El árbol está listo. Escribe la secuencia del recorrido o responde la pregunta de conceptos.";
   mostrarPreguntaActual();
 }
 
@@ -1093,9 +1260,29 @@ function mostrarPreguntaActual() {
   }
 
   const pregunta = appState.quiz.preguntas[appState.quiz.indice];
-  const recorridoLabel = pregunta.tipo.charAt(0).toUpperCase() + pregunta.tipo.slice(1);
-  document.getElementById("quiz-title").textContent = `Pregunta ${appState.quiz.indice + 1} de ${appState.quiz.preguntas.length} — ${recorridoLabel}`;
-  renderQuizTree(pregunta.arbol);
+  const indicePregunta = appState.quiz.indice + 1;
+  const cantidadPreguntas = appState.quiz.preguntas.length;
+  const respuestaLabel = document.getElementById("quiz-answer-label");
+
+  if (pregunta.categoria === "recorrido") {
+    const recorridoLabel = pregunta.tipo.charAt(0).toUpperCase() + pregunta.tipo.slice(1);
+    document.getElementById("quiz-title").textContent = `Pregunta ${indicePregunta} de ${cantidadPreguntas} — Recorrido ${recorridoLabel}`;
+    renderQuizTree(pregunta.arbol);
+    respuestaLabel.textContent = "Escribe la secuencia correcta";
+    document.getElementById("quiz-answer").placeholder = "Ej. 10 5 2 8 15";
+    document.getElementById("quiz-feedback").textContent = "El árbol está listo. Escribe la secuencia del recorrido indicado.";
+  } else {
+    document.getElementById("quiz-title").textContent = `Pregunta ${indicePregunta} de ${cantidadPreguntas} — Concepto`;
+    const container = document.getElementById("quiz-tree-container");
+    container.innerHTML = "";
+    const enunciado = document.createElement("div");
+    enunciado.className = "empty-state";
+    enunciado.textContent = pregunta.pregunta;
+    container.appendChild(enunciado);
+    respuestaLabel.textContent = "Escribe la respuesta correcta";
+    document.getElementById("quiz-answer").placeholder = "Escribe tu respuesta";
+    document.getElementById("quiz-feedback").textContent = "Escribe tu respuesta en el campo.";
+  }
   document.getElementById("quiz-answer").focus();
 }
 
@@ -1111,6 +1298,16 @@ function normalizarSecuenciaRespuesta(valor) {
     .map((item) => String(item).trim().toUpperCase());
 }
 
+function normalizarRespuestaConceptual(valor) {
+  return valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[¿?.,:;]/g, "")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
 function evaluarRespuestaActual() {
   if (!appState.quiz) {
     document.getElementById("quiz-feedback").textContent = "Primero inicia el cuestionario.";
@@ -1124,18 +1321,33 @@ function evaluarRespuestaActual() {
   }
 
   const pregunta = appState.quiz.preguntas[appState.quiz.indice];
-  const respuestaNormalizada = normalizarSecuenciaRespuesta(respuesta);
-  const esperada = pregunta.secuencia.map((valor) => String(valor).toUpperCase());
   document.getElementById("quiz-answer").value = "";
 
-  const correcta = JSON.stringify(respuestaNormalizada) === JSON.stringify(esperada);
+  let correcta;
+  let retroalimentacion;
+  if (pregunta.categoria === "recorrido") {
+    const respuestaNormalizada = normalizarSecuenciaRespuesta(respuesta);
+    const esperada = pregunta.secuencia.map((valor) => String(valor).toUpperCase());
+    correcta = JSON.stringify(respuestaNormalizada) === JSON.stringify(esperada);
+    retroalimentacion = correcta
+      ? `¡Correcto! El recorrido ${pregunta.tipo} es ${esperada.join(" ")}.`
+      : `Incorrecto. La secuencia correcta era: ${esperada.join(" ")}.`;
+  } else {
+    const respuestaNormalizada = normalizarRespuestaConceptual(respuesta);
+    correcta = pregunta.respuestasAceptadas.some(
+      (respuestaAceptada) => normalizarRespuestaConceptual(respuestaAceptada) === respuestaNormalizada
+    );
+    retroalimentacion = correcta
+      ? `¡Correcto! ${pregunta.explicacion}`
+      : `Incorrecto. ${pregunta.explicacion} Respuesta: ${pregunta.respuesta}.`;
+  }
 
   if (correcta) {
     appState.quiz.correctas += 1;
-    document.getElementById("quiz-feedback").textContent = `¡Correcto! El recorrido ${pregunta.tipo} es ${esperada.join(" ")}.`;
+    document.getElementById("quiz-feedback").textContent = retroalimentacion;
   } else {
     appState.quiz.incorrectas += 1;
-    document.getElementById("quiz-feedback").textContent = `Incorrecto. La secuencia correcta era: ${esperada.join(" ")}.`;
+    document.getElementById("quiz-feedback").textContent = retroalimentacion;
   }
 
   appState.quiz.indice += 1;
