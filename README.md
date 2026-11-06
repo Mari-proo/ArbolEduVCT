@@ -31,6 +31,7 @@ Ayudar a estudiantes de tercer semestre o posteriores a comprender conceptos cla
 - Eliminación con los tres casos clásicos.
 - Búsqueda paso a paso.
 - Recorridos preorden, inorden y postorden.
+- Análisis de cada subárbol con conteo de la raíz y sus hijos directos, recorridos, altura, grado y nivel.
 - Teoría dinámica con glosario.
 - Quiz con 10 preguntas por intento y calificación final.
 

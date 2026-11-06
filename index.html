@@ -68,11 +68,15 @@
                   <button id="load-example-btn">Ejemplo</button>
                   <button id="reset-simulator-btn">Reiniciar</button>
                 </div>
+                <div class="toolbar-group action-buttons compact">
+                  <button id="analyze-subtrees-btn" aria-controls="subtree-analysis">Analizar subárboles</button>
+                </div>
               </div>
 
               <div class="visual-area">
                 <div id="tree-container" class="tree-container" aria-live="polite"></div>
               </div>
+              <section id="subtree-analysis" class="subtree-analysis" aria-live="polite" hidden></section>
             </div>
 
             <aside class="console-panel">

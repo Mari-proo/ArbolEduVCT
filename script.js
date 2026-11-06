@@ -230,6 +230,53 @@ class ArbolBinario {
     return 1 + Math.max(this.altura(nodo.izquierda), this.altura(nodo.derecha));
   }
 
+  analizarSubarboles() {
+    const subarboles = [];
+
+    const analizarNodo = (nodo, nivel, camino) => {
+      if (!nodo) {
+        return {
+          cantidadNodos: 0,
+          altura: -1,
+          grado: 0,
+          preorden: [],
+          inorden: [],
+          postorden: []
+        };
+      }
+
+      const analisis = {
+        nodo,
+        nivel,
+        camino,
+        gradoRaiz: Number(Boolean(nodo.izquierda)) + Number(Boolean(nodo.derecha)),
+        cantidadNodosDirectos: 1 + Number(Boolean(nodo.izquierda)) + Number(Boolean(nodo.derecha)),
+        cantidadNodos: 0,
+        altura: 0,
+        grado: 0,
+        preorden: [],
+        inorden: [],
+        postorden: []
+      };
+      subarboles.push(analisis);
+
+      const izquierda = analizarNodo(nodo.izquierda, nivel + 1, [...camino, "izquierda"]);
+      const derecha = analizarNodo(nodo.derecha, nivel + 1, [...camino, "derecha"]);
+
+      analisis.cantidadNodos = 1 + izquierda.cantidadNodos + derecha.cantidadNodos;
+      analisis.altura = 1 + Math.max(izquierda.altura, derecha.altura);
+      analisis.grado = Math.max(analisis.gradoRaiz, izquierda.grado, derecha.grado);
+      analisis.preorden = [nodo.valor, ...izquierda.preorden, ...derecha.preorden];
+      analisis.inorden = [...izquierda.inorden, nodo.valor, ...derecha.inorden];
+      analisis.postorden = [...izquierda.postorden, ...derecha.postorden, nodo.valor];
+
+      return analisis;
+    };
+
+    analizarNodo(this.raiz, 0, []);
+    return subarboles;
+  }
+
   formatearValor(valor) {
     return String(valor);
   }
@@ -330,10 +377,17 @@ const conceptData = {
   },
   altura: {
     titulo: "Altura",
-    definicion: "La altura de un árbol mide la longitud máxima de una ruta desde la raíz hasta una hoja.",
-    significado: "Se usa para analizar eficiencia y profundidad del árbol.",
-    ejemplo: "La altura del árbol que tiene raíz 50 y hojas 20 y 80 puede ser 2 según la convención de contar niveles desde la raíz.",
+    definicion: "La altura de un árbol es la cantidad de aristas en la ruta más larga desde su raíz hasta una hoja.",
+    significado: "Se usa para analizar la profundidad y la forma del árbol. Una hoja tiene altura 0.",
+    ejemplo: "Si 50 es la raíz y 20 y 80 son sus hijos, la altura del árbol es 1 arista.",
     colores: ["Altura"]
+  },
+  grado: {
+    titulo: "Grado",
+    definicion: "El grado de un nodo es la cantidad de hijos que tiene; en un árbol binario puede ser 0, 1 o 2.",
+    significado: "El grado de un subárbol es el mayor grado de cualquiera de sus nodos.",
+    ejemplo: "Si 50 tiene como hijos a 20 y 80, su grado es 2; si ninguno tiene hijos, el grado del árbol también es 2.",
+    colores: ["Grado"]
   },
   nivel: {
     titulo: "Nivel",
@@ -499,6 +553,98 @@ function renderTree(treeRoot, containerId = "tree-container") {
   return { positions, nodeMap };
 }
 
+function ocultarAnalisisSubarboles() {
+  const panel = document.getElementById("subtree-analysis");
+  panel.hidden = true;
+  panel.innerHTML = "";
+}
+
+function mostrarAnalisisSubarboles() {
+  if (appState.animationLock) {
+    appendConsole("Hay una operación en curso. Espera a que termine antes de analizar los subárboles.", "warning");
+    return;
+  }
+
+  const panel = document.getElementById("subtree-analysis");
+  const subarboles = appState.tree.analizarSubarboles();
+  const subarbolesConRamas = subarboles.filter((analisis) => analisis.gradoRaiz > 0);
+  panel.innerHTML = "";
+  panel.hidden = false;
+
+  const titulo = document.createElement("h3");
+  titulo.textContent = "Análisis de subárboles";
+  panel.appendChild(titulo);
+
+  if (subarboles.length === 0) {
+    const mensaje = document.createElement("p");
+    mensaje.textContent = "Inserta valores para analizar los subárboles.";
+    panel.appendChild(mensaje);
+    return;
+  }
+
+  const analisisCompleto = subarboles[0];
+  const resumen = document.createElement("p");
+  resumen.className = "subtree-summary";
+  resumen.textContent = `Árbol completo: ${analisisCompleto.cantidadNodos} nodos totales, altura ${analisisCompleto.altura} ${analisisCompleto.altura === 1 ? "arista" : "aristas"} y grado máximo ${analisisCompleto.grado}.`;
+  panel.appendChild(resumen);
+
+  if (subarbolesConRamas.length === 0) {
+    const mensaje = document.createElement("p");
+    mensaje.textContent = "No hay subárboles con ramas para mostrar; las hojas se excluyen del análisis individual.";
+    panel.appendChild(mensaje);
+    return;
+  }
+
+  const lista = document.createElement("div");
+  lista.className = "subtree-list";
+
+  for (const analisis of subarbolesConRamas) {
+    const tarjeta = document.createElement("article");
+    tarjeta.className = "subtree-card";
+
+    const encabezado = document.createElement("h4");
+    encabezado.textContent = `Subárbol con raíz ${formatValue(analisis.nodo.valor)}`;
+    tarjeta.appendChild(encabezado);
+
+    const ruta = document.createElement("p");
+    const direcciones = analisis.camino.map((direccion) => direccion === "izquierda" ? "izquierda" : "derecha");
+    ruta.className = "subtree-path";
+    ruta.textContent = `Ruta: ${direcciones.length ? direcciones.join(" → ") : "raíz"} · Nivel ${analisis.nivel}`;
+    tarjeta.appendChild(ruta);
+
+    const metricas = document.createElement("ul");
+    metricas.className = "subtree-metrics";
+    const datosMetricas = [
+      `Nodos (raíz e hijos directos): ${analisis.cantidadNodosDirectos}`,
+      `Altura: ${analisis.altura} ${analisis.altura === 1 ? "arista" : "aristas"}`,
+      `Grado de la raíz: ${analisis.gradoRaiz}`,
+      `Grado máximo del subárbol: ${analisis.grado}`
+    ];
+    for (const dato of datosMetricas) {
+      const elemento = document.createElement("li");
+      elemento.textContent = dato;
+      metricas.appendChild(elemento);
+    }
+    tarjeta.appendChild(metricas);
+
+    const recorridos = [
+      ["Preorden", analisis.preorden],
+      ["Inorden", analisis.inorden],
+      ["Postorden", analisis.postorden]
+    ];
+    for (const [nombre, secuencia] of recorridos) {
+      const recorrido = document.createElement("p");
+      recorrido.className = "subtree-traversal";
+      recorrido.textContent = `${nombre}: ${secuencia.map(formatValue).join(" → ")}`;
+      tarjeta.appendChild(recorrido);
+    }
+
+    lista.appendChild(tarjeta);
+  }
+
+  panel.appendChild(lista);
+}
+
 function highlightTreeNode(nodeId, extraClass = "visiting") {
   const container = document.getElementById("tree-container");
   if (!container) {
@@ -588,6 +734,7 @@ async function animarInsercion(valor) {
     if (ruta.ruta.length === 0) {
       appendConsole(`El árbol está vacío. Se insertará como raíz.`, "info");
       appState.tree.insertar(valorNormalizado);
+      ocultarAnalisisSubarboles();
       renderTree(appState.tree.raiz);
       appendConsole(`Inserción exitosa: ${formatValue(valorNormalizado)} es la raíz.`, "success");
       appState.animationLock = false;
@@ -611,6 +758,9 @@ async function animarInsercion(valor) {
     }
 
     const validacion = appState.tree.insertar(valorNormalizado);
+    if (validacion.exito) {
+      ocultarAnalisisSubarboles();
+    }
     renderTree(appState.tree.raiz);
 
     if (validacion.exito) {
@@ -666,6 +816,9 @@ async function animarEliminacion(valorEliminar) {
     }
 
     const resultado = appState.tree.eliminar(valor);
+    if (resultado.encontrado) {
+      ocultarAnalisisSubarboles();
+    }
     renderTree(appState.tree.raiz);
     appendConsole(resultado.mensaje, resultado.encontrado ? "success" : "error");
   } catch (error) {
@@ -736,6 +889,7 @@ async function ejecutarRecorrido(tipo) {
 
 function reiniciarSimulador() {
   appState.tree = new ArbolBinario();
+  ocultarAnalisisSubarboles();
   renderTree(null, "tree-container");
   clearConsole();
   appendConsole("Simulador reiniciado. El árbol está vacío.", "info");
@@ -743,6 +897,7 @@ function reiniciarSimulador() {
 
 function limpiarArbol() {
   appState.tree = new ArbolBinario();
+  ocultarAnalisisSubarboles();
   renderTree(null, "tree-container");
   appendConsole("El árbol fue limpiado completamente.", "info");
 }
@@ -753,6 +908,7 @@ function cargarEjemplo() {
   for (const valor of exampleValues) {
     appState.tree.insertar(valor);
   }
+  ocultarAnalisisSubarboles();
   renderTree(appState.tree.raiz, "tree-container");
   appendConsole(`Se cargó un árbol de ejemplo con valores: ${exampleValues.join(", ")}.`, "success");
 }
@@ -1084,6 +1240,7 @@ function setupEvents() {
   document.getElementById("clear-tree-btn").addEventListener("click", limpiarArbol);
   document.getElementById("reset-simulator-btn").addEventListener("click", reiniciarSimulador);
   document.getElementById("load-example-btn").addEventListener("click", cargarEjemplo);
+  document.getElementById("analyze-subtrees-btn").addEventListener("click", mostrarAnalisisSubarboles);
   document.getElementById("clear-console-btn").addEventListener("click", clearConsole);
 
   document.getElementById("start-quiz-btn").addEventListener("click", iniciarCuestionario);

@@ -76,6 +76,15 @@ Al pulsar cualquiera de los botones, la interfaz:
 - muestra la secuencia real,
 - imprime la salida en la consola integrada.
 
+### Análisis de subárboles
+
+1. Pulsa **Analizar subárboles** después de construir el árbol.
+2. Se muestra un resumen del árbol completo y una ficha por cada nodo que tiene al menos un hijo, considerado como raíz de un subárbol.
+3. Cada ficha cuenta solo la raíz y sus hijos directos (de 1 a 3 nodos). También muestra los recorridos preorden, inorden y postorden, la altura completa del subárbol, el grado de su raíz, el grado máximo del subárbol y el nivel de esa raíz en el árbol completo.
+4. Los recorridos y las medidas de altura y grado abarcan todas las ramas del subárbol; el conteo de nodos de la ficha solo incluye la raíz y sus hijos directos. Las hojas no se muestran como subárboles individuales. Si el árbol solo tiene una raíz-hoja, se muestra un aviso sin fichas de subárbol.
+5. El resumen del árbol completo sí cuenta todos sus nodos. La altura cuenta aristas desde la raíz del subárbol hasta su hoja más lejana; una hoja tiene altura 0. El nivel de la raíz del árbol es 0. El grado de un nodo es la cantidad de hijos que tiene, y el grado del subárbol es el grado máximo entre sus nodos.
+6. Si el árbol cambia, el resultado anterior se oculta; vuelve a pulsar el botón para analizar su estructura actual.
+
 ## 7. Módulo teórico
 
 La sección teórica presenta un glosario con conceptos fundamentales:
@@ -90,6 +99,7 @@ La sección teórica presenta un glosario con conceptos fundamentales:
 - Hoja
 - Subárbol
 - Altura
+- Grado
 - Nivel
 
 Cada concepto incluye:

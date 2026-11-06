@@ -775,6 +775,69 @@ input:focus {
   overflow: auto;
 }
 
+.subtree-analysis {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #dfe3d8;
+  border-radius: 14px;
+  background: #fdfcf7;
+  color: #44574b;
+}
+
+.subtree-analysis[hidden] {
+  display: none;
+}
+
+.subtree-analysis h3,
+.subtree-card h4 {
+  margin-bottom: 0.45rem;
+  color: #345442;
+}
+
+.subtree-summary,
+.subtree-path {
+  color: #5c6e61;
+}
+
+.subtree-summary {
+  font-weight: 650;
+}
+
+.subtree-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 0.75rem;
+}
+
+.subtree-card {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid #e1e3d8;
+  border-radius: 11px;
+  background: #fffef9;
+}
+
+.subtree-card h4 {
+  overflow-wrap: anywhere;
+}
+
+.subtree-path {
+  font-size: 0.88rem;
+}
+
+.subtree-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.3rem 0.8rem;
+  margin: 0.6rem 0;
+  padding-left: 1.2rem;
+}
+
+.subtree-traversal {
+  margin-bottom: 0.35rem;
+  overflow-wrap: anywhere;
+}
+
 .tree-node {
   border: 2px solid rgba(255, 255, 255, 0.9);
   color: #293a30;
