@@ -1,6 +1,6 @@
-# ArbolEduVCT
+# ArbolEduCYM
 
-ArbolEduVCT es una aplicación web educativa para estudiar árboles binarios de manera visual, práctica y teórica. Permite insertar, eliminar, buscar, recorrer y evaluar conocimientos mediante un mini cuestionario.
+ArbolEduCYM es una aplicación web educativa para estudiar árboles binarios de manera visual, práctica y teórica. Permite insertar, eliminar, buscar, recorrer y evaluar conocimientos mediante un mini cuestionario.
 
 ## Objetivo
 
@@ -27,6 +27,7 @@ Ayudar a estudiantes de tercer semestre o posteriores a comprender conceptos cla
 
 - Inserción con validación.
 - Solo enteros o letras por árbol; no acepta decimales ni mezcla de tipos.
+- El árbol y las colecciones auxiliares se manejan con nodos y listas enlazadas, sin usar arreglos.
 - Acepta valores repetidos y los ubica a la izquierda cuando encuentra un igual.
 - Eliminación con los tres casos clásicos.
 - Búsqueda paso a paso.

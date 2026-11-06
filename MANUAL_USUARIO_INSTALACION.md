@@ -1,8 +1,8 @@
-# Manual de usuario e instalación – ArbolEduVCT
+# Manual de usuario e instalación – ArbolEduCYM
 
 ## 1. Nombre y objetivo
 
-**ArbolEduVCT** es una aplicación educativa interactiva desarrollada para aprender árboles binarios. Su propósito es enseñar visualmente cómo se insertan, eliminan, buscan y recorren los nodos de un árbol binario, además de ofrecer una sección teórica y un cuestionario de evaluación.
+**ArbolEduCYM** es una aplicación educativa interactiva desarrollada para aprender árboles binarios. Su propósito es enseñar visualmente cómo se insertan, eliminan, buscan y recorren los nodos de un árbol binario, además de ofrecer una sección teórica y un cuestionario de evaluación.
 
 ## 2. Requisitos del sistema
 
@@ -120,6 +120,7 @@ Cada concepto incluye:
 - Las letras se ordenan alfabéticamente, sin distinguir entre mayúsculas y minúsculas.
 - Un árbol solo puede contener números enteros o letras, no ambos tipos. El tipo se establece al insertar el primer valor; si se elimina el último nodo, puede elegirse un tipo nuevo.
 - Se permiten valores repetidos y se insertan hacia la izquierda al encontrar un valor igual. La búsqueda devuelve el primer nodo igual que encuentra y cada eliminación quita una sola aparición.
+- La estructura del árbol se construye con nodos enlazados; las rutas, recorridos y preguntas también se guardan en listas enlazadas, sin arreglos.
 
 La visualización del simulador permite desplazarse horizontal y verticalmente cuando el árbol excede el espacio visible, para poder consultar todos sus nodos.
 
@@ -176,4 +177,4 @@ Pulsa el botón **Iniciar cuestionario** y luego escribe la secuencia según el 
 
 ## 11. Conclusión
 
-ArbolEduVCT es una aplicación escolar completa que combina simulación visual, teoría y evaluación, ejecutándose localmente en un navegador moderno sin depender de servicios externos.
+ArbolEduCYM es una aplicación escolar completa que combina simulación visual, teoría y evaluación, ejecutándose localmente en un navegador moderno sin depender de servicios externos.

@@ -2,6 +2,147 @@
 
 let nodoIdCounter = 0;
 
+class ElementoLista {
+  constructor(valor) {
+    this.valor = valor;
+    this.siguiente = null;
+  }
+}
+
+class ListaEnlazada {
+  constructor() {
+    this.primero = null;
+    this.ultimo = null;
+    this.length = 0;
+  }
+
+  append(valor) {
+    const elemento = new ElementoLista(valor);
+    if (this.ultimo) {
+      this.ultimo.siguiente = elemento;
+    } else {
+      this.primero = elemento;
+    }
+    this.ultimo = elemento;
+    this.length += 1;
+    return this;
+  }
+
+  appendAll(lista) {
+    for (const valor of lista) {
+      this.append(valor);
+    }
+    return this;
+  }
+
+  get(indice) {
+    if (indice < 0 || indice >= this.length) {
+      return undefined;
+    }
+    let actual = this.primero;
+    for (let posicion = 0; posicion < indice; posicion += 1) {
+      actual = actual.siguiente;
+    }
+    return actual.valor;
+  }
+
+  removeAt(indice) {
+    if (indice < 0 || indice >= this.length) {
+      return undefined;
+    }
+
+    let anterior = null;
+    let actual = this.primero;
+    for (let posicion = 0; posicion < indice; posicion += 1) {
+      anterior = actual;
+      actual = actual.siguiente;
+    }
+
+    if (anterior) {
+      anterior.siguiente = actual.siguiente;
+    } else {
+      this.primero = actual.siguiente;
+    }
+    if (actual === this.ultimo) {
+      this.ultimo = anterior;
+    }
+    this.length -= 1;
+    return actual.valor;
+  }
+
+  filter(predicado) {
+    const resultado = new ListaEnlazada();
+    for (const valor of this) {
+      if (predicado(valor)) {
+        resultado.append(valor);
+      }
+    }
+    return resultado;
+  }
+
+  some(predicado) {
+    for (const valor of this) {
+      if (predicado(valor)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  map(transformar) {
+    const resultado = new ListaEnlazada();
+    for (const valor of this) {
+      resultado.append(transformar(valor));
+    }
+    return resultado;
+  }
+
+  join(separador) {
+    let salida = "";
+    let primero = true;
+    for (const valor of this) {
+      if (!primero) {
+        salida += separador;
+      }
+      salida += String(valor);
+      primero = false;
+    }
+    return salida;
+  }
+
+  equals(otraLista) {
+    if (this.length !== otraLista.length) {
+      return false;
+    }
+    let actual = this.primero;
+    let otro = otraLista.primero;
+    while (actual) {
+      if (actual.valor !== otro.valor) {
+        return false;
+      }
+      actual = actual.siguiente;
+      otro = otro.siguiente;
+    }
+    return true;
+  }
+
+  *[Symbol.iterator]() {
+    let actual = this.primero;
+    while (actual) {
+      yield actual.valor;
+      actual = actual.siguiente;
+    }
+  }
+}
+
+function crearLista(valorUno, valorDos, valorTres) {
+  const lista = new ListaEnlazada();
+  if (valorUno !== undefined) lista.append(valorUno);
+  if (valorDos !== undefined) lista.append(valorDos);
+  if (valorTres !== undefined) lista.append(valorTres);
+  return lista;
+}
+
 class Nodo {
   constructor(valor) {
     this.id = ++nodoIdCounter;
@@ -92,24 +233,24 @@ class ArbolBinario {
   }
 
   buscar(valor) {
-    const visitados = [];
-    const camino = [];
+    const visitados = new ListaEnlazada();
+    const camino = new ListaEnlazada();
     let actual = this.raiz;
 
     while (actual) {
-      visitados.push(actual.valor);
+      visitados.append(actual.valor);
       const comparacion = this.compararValores(valor, actual.valor);
 
       if (comparacion === 0) {
-        camino.push({ nodo: actual, direccion: "encontrado" });
+        camino.append({ nodo: actual, direccion: "encontrado" });
         return { encontrado: true, camino, visitados, nodo: actual };
       }
 
       if (comparacion < 0) {
-        camino.push({ nodo: actual, direccion: "izquierda" });
+        camino.append({ nodo: actual, direccion: "izquierda" });
         actual = actual.izquierda;
       } else {
-        camino.push({ nodo: actual, direccion: "derecha" });
+        camino.append({ nodo: actual, direccion: "derecha" });
         actual = actual.derecha;
       }
     }
@@ -178,7 +319,7 @@ class ArbolBinario {
   }
 
   preorden() {
-    const salida = [];
+    const salida = new ListaEnlazada();
     this._recorrerPreorden(this.raiz, salida);
     return salida;
   }
@@ -187,13 +328,13 @@ class ArbolBinario {
     if (!nodo) {
       return;
     }
-    salida.push(nodo.valor);
+    salida.append(nodo.valor);
     this._recorrerPreorden(nodo.izquierda, salida);
     this._recorrerPreorden(nodo.derecha, salida);
   }
 
   inorden() {
-    const salida = [];
+    const salida = new ListaEnlazada();
     this._recorrerInorden(this.raiz, salida);
     return salida;
   }
@@ -203,12 +344,12 @@ class ArbolBinario {
       return;
     }
     this._recorrerInorden(nodo.izquierda, salida);
-    salida.push(nodo.valor);
+    salida.append(nodo.valor);
     this._recorrerInorden(nodo.derecha, salida);
   }
 
   postorden() {
-    const salida = [];
+    const salida = new ListaEnlazada();
     this._recorrerPostorden(this.raiz, salida);
     return salida;
   }
@@ -219,7 +360,7 @@ class ArbolBinario {
     }
     this._recorrerPostorden(nodo.izquierda, salida);
     this._recorrerPostorden(nodo.derecha, salida);
-    salida.push(nodo.valor);
+    salida.append(nodo.valor);
   }
 
   altura(nodo = this.raiz) {
@@ -231,7 +372,7 @@ class ArbolBinario {
   }
 
   analizarSubarboles() {
-    const subarboles = [];
+    const subarboles = new ListaEnlazada();
 
     const analizarNodo = (nodo, nivel, camino) => {
       if (!nodo) {
@@ -239,9 +380,9 @@ class ArbolBinario {
           cantidadNodos: 0,
           altura: -1,
           grado: 0,
-          preorden: [],
-          inorden: [],
-          postorden: []
+          preorden: new ListaEnlazada(),
+          inorden: new ListaEnlazada(),
+          postorden: new ListaEnlazada()
         };
       }
 
@@ -254,26 +395,28 @@ class ArbolBinario {
         cantidadNodos: 0,
         altura: 0,
         grado: 0,
-        preorden: [],
-        inorden: [],
-        postorden: []
+        preorden: new ListaEnlazada(),
+        inorden: new ListaEnlazada(),
+        postorden: new ListaEnlazada()
       };
-      subarboles.push(analisis);
+      subarboles.append(analisis);
 
-      const izquierda = analizarNodo(nodo.izquierda, nivel + 1, [...camino, "izquierda"]);
-      const derecha = analizarNodo(nodo.derecha, nivel + 1, [...camino, "derecha"]);
+      const rutaIzquierda = camino ? `${camino} → izquierda` : "izquierda";
+      const rutaDerecha = camino ? `${camino} → derecha` : "derecha";
+      const izquierda = analizarNodo(nodo.izquierda, nivel + 1, rutaIzquierda);
+      const derecha = analizarNodo(nodo.derecha, nivel + 1, rutaDerecha);
 
       analisis.cantidadNodos = 1 + izquierda.cantidadNodos + derecha.cantidadNodos;
       analisis.altura = 1 + Math.max(izquierda.altura, derecha.altura);
       analisis.grado = Math.max(analisis.gradoRaiz, izquierda.grado, derecha.grado);
-      analisis.preorden = [nodo.valor, ...izquierda.preorden, ...derecha.preorden];
-      analisis.inorden = [...izquierda.inorden, nodo.valor, ...derecha.inorden];
-      analisis.postorden = [...izquierda.postorden, ...derecha.postorden, nodo.valor];
+      analisis.preorden.append(nodo.valor).appendAll(izquierda.preorden).appendAll(derecha.preorden);
+      analisis.inorden.appendAll(izquierda.inorden).append(nodo.valor).appendAll(derecha.inorden);
+      analisis.postorden.appendAll(izquierda.postorden).appendAll(derecha.postorden).append(nodo.valor);
 
       return analisis;
     };
 
-    analizarNodo(this.raiz, 0, []);
+    analizarNodo(this.raiz, 0, "");
     return subarboles;
   }
 
@@ -282,7 +425,7 @@ class ArbolBinario {
   }
 
   rutaInsercion(valor) {
-    const ruta = [];
+    const ruta = new ListaEnlazada();
     let actual = this.raiz;
     let padre = null;
     let duplicado = false;
@@ -293,7 +436,7 @@ class ArbolBinario {
         duplicado = true;
       }
       const direccion = comparacion <= 0 ? "izquierda" : "derecha";
-      ruta.push({ nodo: actual, comparacion, direccion });
+      ruta.append({ nodo: actual, comparacion, direccion });
 
       padre = actual;
       actual = direccion === "izquierda" ? actual.izquierda : actual.derecha;
@@ -317,119 +460,119 @@ const conceptData = {
     definicion: "Un árbol binario es una estructura jerárquica formada por nodos donde cada nodo tiene como máximo dos hijos: izquierdo y derecho.",
     significado: "Permite organizar datos y recorrerlos de manera ordenada, rápida y visualmente comprensible.",
     ejemplo: "Un árbol puede representar una colección de valores como 50, 20, 80, 10, 30, donde la raíz es 50 y cada rama divide el conjunto en subárboles.",
-    colores: ["Raíz", "Hijos", "Hojas"]
+    colores: crearLista("Raíz", "Hijos", "Hojas")
   },
   nodo: {
     titulo: "Nodo",
     definicion: "Un nodo es cada elemento del árbol. Guarda un valor y referencias a sus hijos izquierdo y derecho.",
     significado: "Es la unidad básica que conecta la estructura del árbol.",
     ejemplo: "Cada círculo del árbol es un nodo y contiene un valor como 7 o A.",
-    colores: ["Valor", "Hijo izquierdo", "Hijo derecho"]
+    colores: crearLista("Valor", "Hijo izquierdo", "Hijo derecho")
   },
   "nodo-raiz": {
     titulo: "Nodo raíz",
     definicion: "Es el primer nodo del árbol y el punto de partida para todas las operaciones, como inserción, búsqueda y recorrido.",
     significado: "La raíz determina la estructura general del árbol.",
     ejemplo: "En un árbol con 50 como raíz, todos los demás nodos descienden desde ese valor.",
-    colores: ["Raíz"]
+    colores: crearLista("Raíz")
   },
   padre: {
     titulo: "Nodo padre",
     definicion: "Un padre es un nodo que tiene uno o dos hijos conectados a él.",
     significado: "La relación padre-hijo organiza la jerarquía del árbol.",
     ejemplo: "Si 30 tiene a 20 y 40 como hijos, entonces 30 es el padre de ambos.",
-    colores: ["Padre", "Hijos"]
+    colores: crearLista("Padre", "Hijos")
   },
   hijo: {
     titulo: "Nodo hijo",
     definicion: "Es un nodo conectado directamente debajo de otro nodo, llamado padre.",
     significado: "Cada nodo de un árbol binario puede tener como máximo dos hijos: izquierdo y derecho.",
     ejemplo: "En la relación 50 → 20, el nodo 20 es hijo izquierdo de 50.",
-    colores: ["Hijo izquierdo", "Hijo derecho"]
+    colores: crearLista("Hijo izquierdo", "Hijo derecho")
   },
   rama: {
     titulo: "Rama",
     definicion: "Es el camino de nodos y conexiones que va desde la raíz hacia una hoja.",
     significado: "Las ramas muestran las rutas que pueden seguirse dentro del árbol.",
     ejemplo: "En 50 → 20 → 10, esa secuencia forma una rama desde la raíz hasta la hoja 10.",
-    colores: ["Raíz", "Hijos", "Hoja"]
+    colores: crearLista("Raíz", "Hijos", "Hoja")
   },
   "hijo-izquierdo": {
     titulo: "Hijo izquierdo",
     definicion: "Es el hijo que aparece a la izquierda de un nodo en el árbol binario.",
     significado: "En un árbol binario de búsqueda, todos los valores menores que la raíz suelen ir a la izquierda.",
     ejemplo: "Si la raíz es 25, entonces 10 puede ir en el hijo izquierdo.",
-    colores: ["Izquierda"]
+    colores: crearLista("Izquierda")
   },
   "hijo-derecho": {
     titulo: "Hijo derecho",
     definicion: "Es el hijo que aparece a la derecha de un nodo en el árbol binario.",
     significado: "En un árbol binario de búsqueda, los valores mayores se ubican a la derecha.",
     ejemplo: "Si la raíz es 25, entonces 30 puede ir en el hijo derecho.",
-    colores: ["Derecha"]
+    colores: crearLista("Derecha")
   },
   hoja: {
     titulo: "Hoja",
     definicion: "Una hoja es un nodo que no tiene hijos.",
     significado: "Marca el final de una rama del árbol.",
     ejemplo: "Si 10 no tiene descendientes, es una hoja.",
-    colores: ["Hoja"]
+    colores: crearLista("Hoja")
   },
   subarbol: {
     titulo: "Subárbol",
     definicion: "Un subárbol es cualquier parte del árbol que se toma como raíz de una estructura secundaria.",
     significado: "Permite resolver operaciones recursivas sobre una porción del árbol.",
     ejemplo: "El conjunto de nodos bajo 30 forma el subárbol izquierdo del nodo 50.",
-    colores: ["Subárbol"]
+    colores: crearLista("Subárbol")
   },
   altura: {
     titulo: "Altura",
     definicion: "La altura de un árbol es la cantidad de aristas en la ruta más larga desde su raíz hasta una hoja.",
     significado: "Se usa para analizar la profundidad y la forma del árbol. Una hoja tiene altura 0.",
     ejemplo: "Si 50 es la raíz y 20 y 80 son sus hijos, la altura del árbol es 1 arista.",
-    colores: ["Altura"]
+    colores: crearLista("Altura")
   },
   grado: {
     titulo: "Grado",
     definicion: "El grado de un nodo es la cantidad de hijos directos que tiene; en un árbol binario puede ser 0, 1 o 2.",
     significado: "El grado del árbol es el mayor grado entre sus nodos.",
     ejemplo: "Si 50 tiene como hijos a 20 y 80, el grado de 50 es 2. Si ningún nodo tiene más de un hijo, el grado del árbol es 1.",
-    colores: ["Grado"]
+    colores: crearLista("Grado")
   },
   orden: {
     titulo: "Orden",
     definicion: "El orden de un árbol indica el máximo número de hijos que puede tener cada nodo.",
     significado: "En un árbol binario el orden es 2: cada nodo puede tener hijo izquierdo, hijo derecho, ambos o ninguno.",
     ejemplo: "Un nodo con dos hijos alcanza el máximo permitido por el orden 2 de un árbol binario.",
-    colores: ["Hijo izquierdo", "Hijo derecho"]
+    colores: crearLista("Hijo izquierdo", "Hijo derecho")
   },
   nivel: {
     titulo: "Nivel",
     definicion: "El nivel indica la profundidad de un nodo respecto de la raíz.",
     significado: "La raíz está en el nivel 0, sus hijos en el nivel 1 y así sucesivamente.",
     ejemplo: "Los nodos 20 y 80 están en el nivel 1 si son hijos de 50.",
-    colores: ["Nivel 0", "Nivel 1", "Nivel 2"]
+    colores: crearLista("Nivel 0", "Nivel 1", "Nivel 2")
   },
   "arboles-distintos": {
     titulo: "Árboles binarios distintos",
     definicion: "Dos árboles binarios son distintos cuando su estructura o la disposición de sus nodos no es la misma.",
     significado: "Comparar su forma permite diferenciarlos aunque tengan la misma cantidad de nodos.",
     ejemplo: "Un árbol con raíz e hijo izquierdo y otro con raíz e hijo derecho tienen estructuras distintas.",
-    colores: ["Estructura A", "Estructura B"]
+    colores: crearLista("Estructura A", "Estructura B")
   },
   "arboles-equivalentes": {
     titulo: "Árboles binarios equivalentes",
     definicion: "Dos árboles binarios son equivalentes cuando tienen la misma estructura, aunque los valores guardados puedan ser diferentes.",
     significado: "La equivalencia compara la forma y las relaciones padre-hijo, no los datos de cada nodo.",
     ejemplo: "Dos árboles con raíz y dos hijos en las mismas posiciones son equivalentes aunque sus valores sean distintos.",
-    colores: ["Misma estructura"]
+    colores: crearLista("Misma estructura")
   },
   "arbol-completo": {
     titulo: "Árbol binario completo",
     definicion: "Es un árbol en el que todos los niveles, excepto quizá el último, están llenos; el último se ocupa de izquierda a derecha.",
     significado: "Esta forma mantiene los nodos lo más agrupados posible hacia la izquierda.",
     ejemplo: "Un árbol con todos sus niveles completos salvo el último, cuyos nodos comienzan por la izquierda, es completo.",
-    colores: ["Niveles llenos", "Izquierda"]
+    colores: crearLista("Niveles llenos", "Izquierda")
   }
 };
 
@@ -480,9 +623,14 @@ function clearConsole() {
 }
 
 function obtenerColorNodo(valor, indice) {
-  const palette = ["#c9d9b8", "#e7c99f", "#aec6c2", "#e2b9a8", "#c5bdd7", "#e4d99e"];
   const seed = typeof valor === "string" ? valor.charCodeAt(0) : Number(valor);
-  return palette[Math.abs(seed + indice) % palette.length];
+  const color = Math.abs(seed + indice) % 6;
+  if (color === 0) return "#c9d9b8";
+  if (color === 1) return "#e7c99f";
+  if (color === 2) return "#aec6c2";
+  if (color === 3) return "#e2b9a8";
+  if (color === 4) return "#c5bdd7";
+  return "#e4d99e";
 }
 
 function renderTree(treeRoot, containerId = "tree-container") {
@@ -500,11 +648,11 @@ function renderTree(treeRoot, containerId = "tree-container") {
     return;
   }
 
-  const nodes = [];
+  const nodes = new ListaEnlazada();
   let maxDepth = 0;
   const collect = (node, depth = 0) => {
     if (!node) return;
-    nodes.push({ node, depth });
+    nodes.append({ node, depth });
     maxDepth = Math.max(maxDepth, depth);
     collect(node.izquierda, depth + 1);
     collect(node.derecha, depth + 1);
@@ -617,7 +765,7 @@ function mostrarAnalisisSubarboles() {
     return;
   }
 
-  const analisisCompleto = subarboles[0];
+  const analisisCompleto = subarboles.get(0);
   const tarjetaArbol = document.createElement("article");
   tarjetaArbol.className = "subtree-card";
 
@@ -627,14 +775,14 @@ function mostrarAnalisisSubarboles() {
 
   const metricasArbol = document.createElement("ul");
   metricasArbol.className = "subtree-metrics";
-  const datosArbol = [
+  const datosArbol = crearLista(
     `Cantidad total de nodos: ${analisisCompleto.cantidadNodos}`,
     "Orden: 2",
-    `Nivel de la raíz: ${analisisCompleto.nivel}`,
-    `Altura: ${analisisCompleto.altura} ${analisisCompleto.altura === 1 ? "arista" : "aristas"}`,
-    `Grado de la raíz: ${analisisCompleto.gradoRaiz}`,
-    `Grado máximo del árbol: ${analisisCompleto.grado}`
-  ];
+    `Nivel de la raíz: ${analisisCompleto.nivel}`
+  )
+    .append(`Altura: ${analisisCompleto.altura} ${analisisCompleto.altura === 1 ? "arista" : "aristas"}`)
+    .append(`Grado de la raíz: ${analisisCompleto.gradoRaiz}`)
+    .append(`Grado máximo del árbol: ${analisisCompleto.grado}`);
   for (const dato of datosArbol) {
     const elemento = document.createElement("li");
     elemento.textContent = dato;
@@ -642,15 +790,15 @@ function mostrarAnalisisSubarboles() {
   }
   tarjetaArbol.appendChild(metricasArbol);
 
-  const recorridosArbol = [
-    ["Preorden", analisisCompleto.preorden],
-    ["Inorden", analisisCompleto.inorden],
-    ["Postorden", analisisCompleto.postorden]
-  ];
-  for (const [nombre, secuencia] of recorridosArbol) {
+  const recorridosArbol = crearLista(
+    { nombre: "Preorden", secuencia: analisisCompleto.preorden },
+    { nombre: "Inorden", secuencia: analisisCompleto.inorden },
+    { nombre: "Postorden", secuencia: analisisCompleto.postorden }
+  );
+  for (const recorridoDatos of recorridosArbol) {
     const recorrido = document.createElement("p");
     recorrido.className = "subtree-traversal";
-    recorrido.textContent = `${nombre}: ${secuencia.map(formatValue).join(" → ")}`;
+    recorrido.textContent = `${recorridoDatos.nombre}: ${recorridoDatos.secuencia.map(formatValue).join(" → ")}`;
     tarjetaArbol.appendChild(recorrido);
   }
   panel.appendChild(tarjetaArbol);
@@ -674,20 +822,19 @@ function mostrarAnalisisSubarboles() {
     tarjeta.appendChild(encabezado);
 
     const ruta = document.createElement("p");
-    const direcciones = analisis.camino.map((direccion) => direccion === "izquierda" ? "izquierda" : "derecha");
     ruta.className = "subtree-path";
-    ruta.textContent = `Ruta: ${direcciones.length ? direcciones.join(" → ") : "raíz"} · Nivel ${analisis.nivel}`;
+    ruta.textContent = `Ruta: ${analisis.camino || "raíz"} · Nivel ${analisis.nivel}`;
     tarjeta.appendChild(ruta);
 
     const metricas = document.createElement("ul");
     metricas.className = "subtree-metrics";
-    const datosMetricas = [
+    const datosMetricas = crearLista(
       `Nodos (raíz e hijos directos): ${analisis.cantidadNodosDirectos}`,
       "Orden del árbol binario: 2",
-      `Altura: ${analisis.altura} ${analisis.altura === 1 ? "arista" : "aristas"}`,
-      `Grado de la raíz: ${analisis.gradoRaiz}`,
-      `Grado máximo del subárbol: ${analisis.grado}`
-    ];
+      `Altura: ${analisis.altura} ${analisis.altura === 1 ? "arista" : "aristas"}`
+    )
+      .append(`Grado de la raíz: ${analisis.gradoRaiz}`)
+      .append(`Grado máximo del subárbol: ${analisis.grado}`);
     for (const dato of datosMetricas) {
       const elemento = document.createElement("li");
       elemento.textContent = dato;
@@ -695,15 +842,15 @@ function mostrarAnalisisSubarboles() {
     }
     tarjeta.appendChild(metricas);
 
-    const recorridos = [
-      ["Preorden", analisis.preorden],
-      ["Inorden", analisis.inorden],
-      ["Postorden", analisis.postorden]
-    ];
-    for (const [nombre, secuencia] of recorridos) {
+    const recorridos = crearLista(
+      { nombre: "Preorden", secuencia: analisis.preorden },
+      { nombre: "Inorden", secuencia: analisis.inorden },
+      { nombre: "Postorden", secuencia: analisis.postorden }
+    );
+    for (const recorridoDatos of recorridos) {
       const recorrido = document.createElement("p");
       recorrido.className = "subtree-traversal";
-      recorrido.textContent = `${nombre}: ${secuencia.map(formatValue).join(" → ")}`;
+      recorrido.textContent = `${recorridoDatos.nombre}: ${recorridoDatos.secuencia.map(formatValue).join(" → ")}`;
       tarjeta.appendChild(recorrido);
     }
 
@@ -810,7 +957,7 @@ async function animarInsercion(valor) {
     }
 
     for (let i = 0; i < ruta.ruta.length; i += 1) {
-      const paso = ruta.ruta[i];
+      const paso = ruta.ruta.get(i);
       highlightTreeNode(paso.nodo.id, "visiting");
       appendConsole(`Comparando ${formatValue(valorNormalizado)} con ${formatValue(paso.nodo.valor)}.`, "info");
 
@@ -872,7 +1019,7 @@ async function animarEliminacion(valorEliminar) {
     appendConsole(`Inicia eliminación de ${formatValue(valor)}.`, "info");
 
     for (let i = 0; i < busqueda.camino.length; i += 1) {
-      const paso = busqueda.camino[i];
+      const paso = busqueda.camino.get(i);
       highlightTreeNode(paso.nodo.id, "visiting");
       appendConsole(`Comparando con ${formatValue(paso.nodo.valor)}.`, "info");
       if (paso.direccion === "izquierda") {
@@ -916,39 +1063,21 @@ async function ejecutarRecorrido(tipo) {
 
   appendConsole(`Inicio recorrido ${nombreRecorrido}.`, "info");
 
-  const stack = [];
-  if (tipo === "preorden") {
-    const walk = (nodo) => {
-      if (!nodo) return;
-      stack.push({ nodo, etapa: "visitar" });
-      walk(nodo.izquierda);
-      walk(nodo.derecha);
+  const visitarNodo = async (nodo) => {
+    if (!nodo) return;
+    const visitarActual = async () => {
+      highlightTreeNode(nodo.id, "visiting");
+      appendConsole(`Visita actual: ${formatValue(nodo.valor)}.`, "info");
+      await sleep(550);
     };
-    walk(appState.tree.raiz);
-  } else if (tipo === "inorden") {
-    const walk = (nodo) => {
-      if (!nodo) return;
-      walk(nodo.izquierda);
-      stack.push({ nodo, etapa: "visitar" });
-      walk(nodo.derecha);
-    };
-    walk(appState.tree.raiz);
-  } else {
-    const walk = (nodo) => {
-      if (!nodo) return;
-      walk(nodo.izquierda);
-      walk(nodo.derecha);
-      stack.push({ nodo, etapa: "visitar" });
-    };
-    walk(appState.tree.raiz);
-  }
 
-  for (let i = 0; i < stack.length; i += 1) {
-    const paso = stack[i];
-    highlightTreeNode(paso.nodo.id, "visiting");
-    appendConsole(`Visita actual: ${formatValue(paso.nodo.valor)}.`, "info");
-    await sleep(550);
-  }
+    if (tipo === "preorden") await visitarActual();
+    await visitarNodo(nodo.izquierda);
+    if (tipo === "inorden") await visitarActual();
+    await visitarNodo(nodo.derecha);
+    if (tipo === "postorden") await visitarActual();
+  };
+  await visitarNodo(appState.tree.raiz);
 
   appendConsole(`Secuencia ${nombreRecorrido}: ${secuencia.join(" -> ")}.`, "success");
   clearTreeHighlights();
@@ -971,7 +1100,8 @@ function limpiarArbol() {
 }
 
 function cargarEjemplo() {
-  const exampleValues = [50, 20, 70, 10, 30, 60, 80, 5, 15, 25, 35];
+  const exampleValues = crearLista(50, 20, 70)
+    .append(10).append(30).append(60).append(80).append(5).append(15).append(25).append(35);
   appState.tree = new ArbolBinario();
   for (const valor of exampleValues) {
     appState.tree.insertar(valor);
@@ -985,7 +1115,8 @@ function renderConceptButtons() {
   const list = document.getElementById("concept-list");
   list.innerHTML = "";
 
-  Object.entries(conceptData).forEach(([key, data]) => {
+  for (const key in conceptData) {
+    const data = conceptData[key];
     const button = document.createElement("button");
     button.className = "concept-item" + (appState.activeConcept === key ? " active" : "");
     button.textContent = data.titulo;
@@ -995,7 +1126,7 @@ function renderConceptButtons() {
       renderConceptDetail();
     });
     list.appendChild(button);
-  });
+  }
 }
 
 function renderConceptDetail() {
@@ -1011,11 +1142,31 @@ function renderConceptDetail() {
       <div class="example-box">
         <h4>Microanimación conceptual</h4>
         <div class="tree-legend">
-          ${data.colores.map((color) => `<span class="legend-pill"><span class="legend-dot" style="background:${color.includes("Raíz") ? "#62d0ff" : color.includes("Hijo") || color.includes("Izquierda") ? "#7ef0c1" : color.includes("Derecha") ? "#ffa26b" : color.includes("Hoja") ? "#ffd166" : color.includes("Sub") ? "#b99cff" : color.includes("Nivel") ? "#ff7eb6" : "#62d0ff"};"></span>${color}</span>`).join("")}
+          ${renderConceptLegend(data.colores)}
         </div>
       </div>
     </div>
   `;
+}
+
+function renderConceptLegend(colores) {
+  let leyenda = "";
+  for (const color of colores) {
+    let fondo = "#62d0ff";
+    if (color.includes("Hijo") || color.includes("Izquierda")) {
+      fondo = "#7ef0c1";
+    } else if (color.includes("Derecha")) {
+      fondo = "#ffa26b";
+    } else if (color.includes("Hoja")) {
+      fondo = "#ffd166";
+    } else if (color.includes("Sub")) {
+      fondo = "#b99cff";
+    } else if (color.includes("Nivel")) {
+      fondo = "#ff7eb6";
+    }
+    leyenda += `<span class="legend-pill"><span class="legend-dot" style="background:${fondo};"></span>${color}</span>`;
+  }
+  return leyenda;
 }
 
 function prepareConceptSection() {
@@ -1024,112 +1175,122 @@ function prepareConceptSection() {
 }
 
 function generarPreguntaAleatoria(tipo) {
-  const valoresBase = [50, 30, 70, 20, 40, 60, 80, 10, 25, 35, 75, 90, 15, 45, 95, 5, 12, 68, 88, 22];
+  const valoresBase = crearLista(50, 30, 70)
+    .append(20).append(40).append(60).append(80).append(10).append(25).append(35)
+    .append(75).append(90).append(15).append(45).append(95).append(5).append(12)
+    .append(68).append(88).append(22);
   const cantidad = 6 + Math.floor(Math.random() * 4);
-  const mezcla = [...valoresBase].sort(() => Math.random() - 0.5).slice(0, cantidad);
   const arbol = new ArbolBinario();
 
-  mezcla.forEach((valor) => arbol.insertar(valor));
+  for (let indice = 0; indice < cantidad; indice += 1) {
+    const aleatorio = Math.floor(Math.random() * valoresBase.length);
+    arbol.insertar(valoresBase.removeAt(aleatorio));
+  }
   const secuencia = arbol[tipo]();
   return { categoria: "recorrido", tipo, arbol, secuencia };
 }
 
 function generarPreguntasConceptuales() {
-  return [
-    {
+  const preguntas = new ListaEnlazada();
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama el nodo conectado directamente debajo de otro nodo?",
       respuesta: "hijo",
-      respuestasAceptadas: ["hijo", "nodo hijo"],
+      respuestasAceptadas: crearLista("hijo", "nodo hijo"),
       explicacion: "Un hijo está conectado directamente con su nodo padre."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama el nodo que tiene uno o más hijos?",
       respuesta: "padre",
-      respuestasAceptadas: ["padre", "nodo padre"],
+      respuestasAceptadas: crearLista("padre", "nodo padre"),
       explicacion: "El padre es el nodo del que descienden directamente uno o dos hijos."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama el primer nodo del árbol, que no tiene padre?",
       respuesta: "raíz",
-      respuestasAceptadas: ["raiz", "nodo raiz"],
+      respuestasAceptadas: crearLista("raiz", "nodo raiz"),
       explicacion: "La raíz es el punto inicial del árbol y no tiene padre."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama un nodo que no tiene hijos?",
       respuesta: "hoja",
-      respuestasAceptadas: ["hoja", "nodo hoja"],
+      respuestasAceptadas: crearLista("hoja", "nodo hoja"),
       explicacion: "Una hoja es un nodo sin hijos."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama el camino de nodos desde la raíz hasta una hoja?",
       respuesta: "rama",
-      respuestasAceptadas: ["rama", "una rama"],
+      respuestasAceptadas: crearLista("rama", "una rama"),
       explicacion: "Una rama es una ruta que conecta la raíz con una hoja."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cuál es el orden de un árbol binario (máximo de hijos por nodo)?",
       respuesta: "2",
-      respuestasAceptadas: ["2", "dos"],
+      respuestasAceptadas: crearLista("2", "dos"),
       explicacion: "El orden es 2 porque cada nodo puede tener como máximo dos hijos."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "Si el nodo 40 tiene dos hijos directos, ¿cuál es su grado?",
       respuesta: "2",
-      respuestasAceptadas: ["2", "dos"],
+      respuestasAceptadas: crearLista("2", "dos"),
       explicacion: "El grado de un nodo es la cantidad de hijos directos que tiene."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "Si la raíz está en el nivel 0, ¿en qué nivel están sus hijos directos?",
       respuesta: "1",
-      respuestasAceptadas: ["1", "nivel 1"],
+      respuestasAceptadas: crearLista("1", "nivel 1"),
       explicacion: "Los hijos directos de la raíz están en el nivel 1."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "Si la ruta más larga desde la raíz hasta una hoja tiene 3 aristas, ¿cuál es la altura del árbol?",
       respuesta: "3",
-      respuestasAceptadas: ["3", "3 aristas"],
+      respuestasAceptadas: crearLista("3", "3 aristas"),
       explicacion: "La altura cuenta las aristas de la ruta más larga desde la raíz hasta una hoja."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se clasifican dos árboles cuya estructura o disposición de nodos es diferente?",
       respuesta: "distintos",
-      respuestasAceptadas: ["distintos", "diferentes", "arboles distintos", "arboles binarios distintos"],
+      respuestasAceptadas: crearLista("distintos", "diferentes", "arboles distintos")
+        .append("arboles binarios distintos"),
       explicacion: "Los árboles binarios distintos no tienen la misma estructura o disposición."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se clasifican dos árboles con la misma estructura, aunque sus valores sean diferentes?",
       respuesta: "equivalentes",
-      respuestasAceptadas: ["equivalentes", "arboles equivalentes", "arboles binarios equivalentes"],
+      respuestasAceptadas: crearLista("equivalentes", "arboles equivalentes", "arboles binarios equivalentes"),
       explicacion: "Los árboles equivalentes conservan la misma forma y relaciones entre nodos, aunque cambien los datos."
-    },
-    {
+  });
+  preguntas.append({
       categoria: "concepto",
       pregunta: "¿Cómo se llama el árbol donde todos los niveles salvo quizá el último están llenos y el último se ocupa de izquierda a derecha?",
       respuesta: "completo",
-      respuestasAceptadas: ["completo", "arbol completo", "arbol binario completo"],
+      respuestasAceptadas: crearLista("completo", "arbol completo", "arbol binario completo"),
       explicacion: "En un árbol binario completo, el último nivel se llena de izquierda a derecha."
-    }
-  ];
+  });
+  return preguntas;
 }
 
 function generarPreguntasCuestionario() {
-  const preguntasRecorridos = ["preorden", "inorden", "postorden"].map(generarPreguntaAleatoria);
-  const preguntas = [...preguntasRecorridos, ...generarPreguntasConceptuales()];
+  const pendientes = crearLista(
+    generarPreguntaAleatoria("preorden"),
+    generarPreguntaAleatoria("inorden"),
+    generarPreguntaAleatoria("postorden")
+  ).appendAll(generarPreguntasConceptuales());
+  const preguntas = new ListaEnlazada();
 
-  for (let indice = preguntas.length - 1; indice > 0; indice -= 1) {
-    const aleatorio = Math.floor(Math.random() * (indice + 1));
-    [preguntas[indice], preguntas[aleatorio]] = [preguntas[aleatorio], preguntas[indice]];
+  while (pendientes.length > 0) {
+    const aleatorio = Math.floor(Math.random() * pendientes.length);
+    preguntas.append(pendientes.removeAt(aleatorio));
   }
 
   return preguntas;
@@ -1146,11 +1307,11 @@ function renderQuizTree(arbol) {
     return;
   }
 
-  const nodes = [];
+  const nodes = new ListaEnlazada();
   let maxDepth = 0;
   function walk(node, depth = 0) {
     if (!node) return;
-    nodes.push({ node, depth });
+    nodes.append({ node, depth });
     maxDepth = Math.max(maxDepth, depth);
     walk(node.izquierda, depth + 1);
     walk(node.derecha, depth + 1);
@@ -1259,7 +1420,7 @@ function mostrarPreguntaActual() {
     return;
   }
 
-  const pregunta = appState.quiz.preguntas[appState.quiz.indice];
+  const pregunta = appState.quiz.preguntas.get(appState.quiz.indice);
   const indicePregunta = appState.quiz.indice + 1;
   const cantidadPreguntas = appState.quiz.preguntas.length;
   const respuestaLabel = document.getElementById("quiz-answer-label");
@@ -1287,15 +1448,25 @@ function mostrarPreguntaActual() {
 }
 
 function normalizarSecuenciaRespuesta(valor) {
-  if (!valor) {
-    return [];
-  }
+  const salida = new ListaEnlazada();
+  let elemento = "";
 
-  return valor
-    .replace(/,/g, " ")
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((item) => String(item).trim().toUpperCase());
+  const agregarElemento = () => {
+    if (elemento) {
+      salida.append(elemento.trim().toUpperCase());
+      elemento = "";
+    }
+  };
+
+  for (const caracter of valor) {
+    if (caracter === "," || /\s/.test(caracter)) {
+      agregarElemento();
+    } else {
+      elemento += caracter;
+    }
+  }
+  agregarElemento();
+  return salida;
 }
 
 function normalizarRespuestaConceptual(valor) {
@@ -1320,7 +1491,7 @@ function evaluarRespuestaActual() {
     return;
   }
 
-  const pregunta = appState.quiz.preguntas[appState.quiz.indice];
+  const pregunta = appState.quiz.preguntas.get(appState.quiz.indice);
   document.getElementById("quiz-answer").value = "";
 
   let correcta;
@@ -1328,7 +1499,7 @@ function evaluarRespuestaActual() {
   if (pregunta.categoria === "recorrido") {
     const respuestaNormalizada = normalizarSecuenciaRespuesta(respuesta);
     const esperada = pregunta.secuencia.map((valor) => String(valor).toUpperCase());
-    correcta = JSON.stringify(respuestaNormalizada) === JSON.stringify(esperada);
+    correcta = respuestaNormalizada.equals(esperada);
     retroalimentacion = correcta
       ? `¡Correcto! El recorrido ${pregunta.tipo} es ${esperada.join(" ")}.`
       : `Incorrecto. La secuencia correcta era: ${esperada.join(" ")}.`;
